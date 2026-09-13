@@ -1,11 +1,11 @@
 [
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=github.com&sz=%size%",
-        "jarFileSize": 70240,
-        "fileHash": "sha256-681cffad67ac84684ccd99d81533ff3e10e77c9c756121d007661ab95557275e",
+        "jarFileSize": 72136,
+        "fileHash": "sha256-f73682502521d9dd0a254127d5040df08063bc1c42fbeb0427eaf1dcfb1378df",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 19881,
+        "fileSize": 20775,
         "status": 3,
         "authors": [
             "webcreaters-ux"
@@ -21,6 +21,6 @@
         "description": "Configurable CloudStream website provider with optional user-supplied proxy templates.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WebSourceProvider.cs3",
         "name": "WebSourceProvider",
-        "jarHash": "sha256-e09c1ace8f83cdb8f93963a1239a449303853c8452567f25ff03d1d941fb4598"
+        "jarHash": "sha256-064c77a26ef40ab732c5129685612fd38d48a2c8ef0d8b31c655c40b6a45f2fe"
     }
 ]
