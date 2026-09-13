@@ -18,14 +18,13 @@ import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 class WebSourcePlugin : BasePlugin() {
     private lateinit var provider: WebSourceProvider
 
-    override fun load(context: Context) {
-        WebSourceSettings.init(context)
+    override fun load() {
         provider = WebSourceProvider()
         registerMainAPI(provider)
-        openSettings = { settingsContext -> showSettings(settingsContext) }
     }
 
-    private fun showSettings(context: Context) {
+    fun showSettings(context: Context) {
+        WebSourceSettings.init(context)
         val density = context.resources.displayMetrics.density
         val padding = (16 * density).toInt()
         val spacing = (8 * density).toInt()
@@ -42,7 +41,6 @@ class WebSourcePlugin : BasePlugin() {
             hint = "https://your-authorized-proxy.example/?url={url}"
             setText(WebSourceSettings.proxyUrl)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
-            singleLine = true
         }
         val proxyHelp = TextView(context).apply {
             text = "Use only a proxy endpoint you own or are authorized to use. The URL must contain {url}."
@@ -51,7 +49,6 @@ class WebSourcePlugin : BasePlugin() {
         val userAgent = EditText(context).apply {
             hint = "User-Agent"
             setText(WebSourceSettings.userAgent)
-            singleLine = true
         }
         val qualityLabel = TextView(context).apply {
             text = "Preferred video quality"
