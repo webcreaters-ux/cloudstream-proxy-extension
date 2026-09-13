@@ -1,0 +1,8 @@
+{
+  "name": "CloudStream Proxy Extension",
+  "description": "Configurable website sources with optional authorized proxy templates.",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/plugins.json"
+  ]
+}
