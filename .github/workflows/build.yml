@@ -42,15 +42,15 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
-      - name: Build extension and plugin list
+      - name: Build all extensions and plugin list
         working-directory: src
         run: |
           gradle make makePluginsJson ensureJarCompatibility --stacktrace
 
-      - name: Publish builds branch
+      - name: Publish all plugin builds
         run: |
-          cp src/WebSourceProvider/build/*.cs3 builds/
-          cp src/WebSourceProvider/build/*.jar builds/ 2>/dev/null || true
+          find src -type f -path '*/build/*.cs3' -exec cp {} builds/ \;
+          find src -type f -path '*/build/*.jar' -exec cp {} builds/ \;
           cp src/build/plugins.json builds/
           cd builds
           git config user.email "actions@github.com"
@@ -59,7 +59,7 @@ jobs:
           git commit -m "Build ${GITHUB_SHA}" || exit 0
           git push origin builds
 
-      - name: Upload CS3 artifact
+      - name: Upload CS3 artifacts
         uses: actions/upload-artifact@v4
         with:
           name: cloudstream-proxy-extension
