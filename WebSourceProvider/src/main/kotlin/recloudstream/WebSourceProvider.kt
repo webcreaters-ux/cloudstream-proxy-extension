@@ -5,6 +5,8 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import org.jsoup.Jsoup
 import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 private const val CONFIG_URL = "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/main/sites.json"
 
@@ -49,6 +51,9 @@ class WebSourceProvider : MainAPI() {
         return parsed
     }
 
+    private fun encode(value: String): String =
+        URLEncoder.encode(value, StandardCharsets.UTF_8)
+
     private fun findSite(url: String, cfg: SourcesConfig): SiteConfig? {
         val targetHost = runCatching { URI(url).host }.getOrNull() ?: return null
         return cfg.sites.firstOrNull { site ->
@@ -60,7 +65,7 @@ class WebSourceProvider : MainAPI() {
     private fun proxied(url: String, site: SiteConfig, cfg: SourcesConfig): String {
         val proxyName = site.proxy ?: return url
         val proxy = cfg.proxies.firstOrNull { it.name == proxyName && it.enabled } ?: return url
-        return proxy.template.replace("{url}", StringUtils.encodeUri(url))
+        return proxy.template.replace("{url}", encode(url))
     }
 
     private fun absolute(base: String, value: String): String {
@@ -83,7 +88,7 @@ class WebSourceProvider : MainAPI() {
         val results = mutableListOf<SearchResponse>()
         for (site in cfg.sites.filter { it.enabled && !it.searchUrl.isNullOrBlank() }) {
             val url = site.searchUrl!!
-                .replace("{query}", StringUtils.encodeUri(query))
+                .replace("{query}", encode(query))
                 .replace("{page}", "1")
             val document = runCatching {
                 Jsoup.parse(app.get(proxied(url, site, cfg)).text, site.baseUrl)
