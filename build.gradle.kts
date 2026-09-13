@@ -65,6 +65,7 @@ subprojects {
     }
 }
 
+// All provider modules are discovered automatically by settings.gradle.kts.
 task<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
