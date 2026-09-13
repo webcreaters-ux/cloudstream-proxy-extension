@@ -12,6 +12,19 @@
       "descriptionSelector": "body",
       "mediaSelector": "video source, video, iframe",
       "proxy": null
+    },
+    {
+      "name": "Yandex Video",
+      "baseUrl": "https://yandex.com/video",
+      "enabled": true,
+      "searchUrl": "https://yandex.com/video/search?text={query}",
+      "resultSelector": "a[href*='/video/preview/'], a[href*='/video/'], a[href*='yandex.com/video/preview/']",
+      "linkSelector": "a[href*='/video/preview/'], a[href*='/video/']",
+      "titleSelector": "h1",
+      "posterSelector": "img[src]",
+      "descriptionSelector": "body",
+      "mediaSelector": "video source, video, source, iframe",
+      "proxy": null
     }
   ],
   "proxies": [
