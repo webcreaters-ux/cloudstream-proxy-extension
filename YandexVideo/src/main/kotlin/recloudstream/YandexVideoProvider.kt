@@ -15,7 +15,7 @@ class YandexVideoProvider : MainAPI() {
 
     private fun encode(value: String) = URLEncoder.encode(value, StandardCharsets.UTF_8)
     private fun absolute(base: String, value: String) = runCatching { URI.create(base).resolve(value).toString() }.getOrDefault(value)
-    private fun getDocument(url: String) = Jsoup.parse(
+    private suspend fun getDocument(url: String) = Jsoup.parse(
         app.get(url, headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")).text,
         url
     )
