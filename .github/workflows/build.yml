@@ -52,6 +52,7 @@ jobs:
           find src -type f -path '*/build/*.cs3' -exec cp {} builds/ \;
           find src -type f -path '*/build/*.jar' -exec cp {} builds/ \;
           cp src/build/plugins.json builds/
+          cp src/repo.json builds/
           cd builds
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
