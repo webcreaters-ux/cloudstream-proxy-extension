@@ -1,29 +1,16 @@
 package recloudstream
 
-import com.lagradost.cloudstream3.HomePageList
-import com.lagradost.cloudstream3.HomePageResponse
-import com.lagradost.cloudstream3.LoadResponse
-import com.lagradost.cloudstream3.MainAPI
-import com.lagradost.cloudstream3.MainPageRequest
-import com.lagradost.cloudstream3.SearchResponse
-import com.lagradost.cloudstream3.SearchResponseList
-import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.TvType
-import com.lagradost.cloudstream3.app
-import com.lagradost.cloudstream3.newHomePageResponse
-import com.lagradost.cloudstream3.newMovieLoadResponse
-import com.lagradost.cloudstream3.newMovieSearchResponse
-import com.lagradost.cloudstream3.toNewSearchResponseList
-import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.ExtractorLinkType
-import com.lagradost.cloudstream3.utils.Qualities
-import com.lagradost.cloudstream3.utils.StringUtils.encodeUri
-import com.lagradost.cloudstream3.utils.loadExtractor
-import com.lagradost.cloudstream3.utils.newExtractorLink
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.extractors.ExtractorLinkType
+import com.lagradost.cloudstream3.utils.AppUtils.toJson
+import com.lagradost.cloudstream3.utils.StringUtils
 import org.jsoup.Jsoup
+import java.net.URI
 
 private const val CONFIG_URL = "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/main/sites.json"
+
+private val mapper = jacksonObjectMapper()
 
 data class ProxyConfig(val name: String, val template: String, val enabled: Boolean = true)
 
@@ -41,7 +28,10 @@ data class SiteConfig(
     val proxy: String? = null
 )
 
-data class SourcesConfig(val sites: List<SiteConfig> = emptyList(), val proxies: List<ProxyConfig> = emptyList())
+data class SourcesConfig(
+    val sites: List<SiteConfig> = emptyList(),
+    val proxies: List<ProxyConfig> = emptyList()
+)
 
 class WebSourceProvider : MainAPI() {
     override var mainUrl = "https://github.com/webcreaters-ux/cloudstream-proxy-extension"
@@ -54,15 +44,17 @@ class WebSourceProvider : MainAPI() {
 
     private suspend fun config(): SourcesConfig {
         cachedConfig?.let { return it }
-        val parsed = tryParseJson<SourcesConfig>(app.get(CONFIG_URL).text) ?: SourcesConfig()
+        val parsed = runCatching {
+            mapper.readValue(app.get(CONFIG_URL).text, SourcesConfig::class.java)
+        }.getOrDefault(SourcesConfig())
         cachedConfig = parsed
         return parsed
     }
 
     private fun findSite(url: String, cfg: SourcesConfig): SiteConfig? {
-        val targetHost = runCatching { java.net.URI(url).host }.getOrNull() ?: return null
+        val targetHost = runCatching { URI(url).host }.getOrNull() ?: return null
         return cfg.sites.firstOrNull { site ->
-            val host = runCatching { java.net.URI(site.baseUrl).host }.getOrNull()
+            val host = runCatching { URI(site.baseUrl).host }.getOrNull()
             host != null && (targetHost == host || targetHost.endsWith(".$host"))
         }
     }
@@ -70,11 +62,11 @@ class WebSourceProvider : MainAPI() {
     private fun proxied(url: String, site: SiteConfig, cfg: SourcesConfig): String {
         val proxyName = site.proxy ?: return url
         val proxy = cfg.proxies.firstOrNull { it.name == proxyName && it.enabled } ?: return url
-        return proxy.template.replace("{url}", url.encodeUri())
+        return proxy.template.replace("{url}", StringUtils.encodeUri(url))
     }
 
     private fun absolute(base: String, value: String): String {
-        return runCatching { java.net.URI(java.net.URI(base), value).toString() }.getOrDefault(value)
+        return runCatching { URI(base).resolve(value).toString() }.getOrDefault(value)
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
@@ -88,66 +80,36 @@ class WebSourceProvider : MainAPI() {
         )
     }
 
-    override suspend fun search(query: String, page: Int): SearchResponseList? {
+    override suspend fun search(query: String): List<SearchResponse> {
         val cfg = config()
         val results = mutableListOf<SearchResponse>()
-
         for (site in cfg.sites.filter { it.enabled && !it.searchUrl.isNullOrBlank() }) {
-            runCatching {
-                val target = site.searchUrl!!
-                    .replace("{query}", query.encodeUri())
-                    .replace("{page}", page.toString())
-                val url = proxied(target, site, cfg)
-                val doc = Jsoup.parse(app.get(url, referer = site.baseUrl).text, target)
-
-                doc.select(site.resultSelector).take(40).forEach { item ->
-                    val linkElement = if (site.linkSelector.isBlank()) item else item.selectFirst(site.linkSelector)
-                    val href = linkElement?.attr("href").orEmpty()
-                    if (href.isBlank()) return@forEach
-
-                    val realUrl = absolute(target, href)
-                    val title = site.titleSelector?.let { item.selectFirst(it)?.text() }
-                        ?.takeIf { it.isNotBlank() }
-                        ?: item.text().trim().ifBlank { realUrl }
-
-                    val poster = site.posterSelector?.let {
-                        item.selectFirst(it)?.let { el ->
-                            el.attr("src").ifBlank { el.attr("data-src") }
-                        }
-                    }
-
-                    results += newMovieSearchResponse(title, realUrl, TvType.Movie) {
-                        posterUrl = poster?.let { absolute(target, it) }
-                    }
-                }
+            val url = site.searchUrl!!
+                .replace("{query}", StringUtils.encodeUri(query))
+                .replace("{page}", "1")
+            val document = runCatching { Jsoup.parse(app.get(proxied(url, site, cfg)).text, site.baseUrl) }.getOrNull() ?: continue
+            document.select(site.resultSelector).forEach { element ->
+                val href = element.attr("href").takeIf { it.isNotBlank() } ?: return@forEach
+                val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
+                    ?: element.text().ifBlank { site.name }
+                results += newMovieSearchResponse(title, absolute(site.baseUrl, href), TvType.Movie)
             }
         }
-
-        return results.distinctBy { it.url }.toNewSearchResponseList()
+        return results.distinctBy { it.url }
     }
 
-    override suspend fun load(url: String): LoadResponse? {
+    override suspend fun load(url: String): LoadResponse {
         val cfg = config()
-        val site = findSite(url, cfg) ?: return null
-        val target = proxied(url, site, cfg)
-        val html = app.get(target, referer = site.baseUrl).text
-        val doc = Jsoup.parse(html, url)
-
-        val title = site.titleSelector?.let { doc.selectFirst(it)?.text() }
-            ?.takeIf { it.isNotBlank() }
-            ?: doc.title().ifBlank { url }
-
-        val poster = site.posterSelector?.let {
-            doc.selectFirst(it)?.let { el ->
-                el.attr("src").ifBlank { el.attr("data-src") }
-            }
-        }
-
-        val plot = site.descriptionSelector?.let { doc.selectFirst(it)?.text() }
-
+        val site = findSite(url, cfg) ?: throw ErrorLoadingException("No configured site for $url")
+        val document = Jsoup.parse(app.get(proxied(url, site, cfg)).text, url)
+        val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
+            ?: document.title().ifBlank { site.name }
+        val poster = site.posterSelector?.let { document.select(it).firstOrNull()?.attr("src") }
+            ?.let { absolute(url, it) }
+        val description = site.descriptionSelector?.let { document.select(it).firstOrNull()?.text() }
         return newMovieLoadResponse(title, url, TvType.Movie, url) {
-            posterUrl = poster?.let { absolute(url, it) }
-            this.plot = plot
+            posterUrl = poster
+            plot = description
         }
     }
 
@@ -159,44 +121,34 @@ class WebSourceProvider : MainAPI() {
     ): Boolean {
         val cfg = config()
         val site = findSite(data, cfg) ?: return false
-        val target = proxied(data, site, cfg)
-        val html = app.get(target, referer = site.baseUrl).text
-        val doc = Jsoup.parse(html, data)
+        val document = Jsoup.parse(app.get(proxied(data, site, cfg)).text, data)
         var found = false
-
-        doc.select(site.mediaSelector).forEach { element ->
-            val raw = element.attr("src")
-                .ifBlank { element.attr("data-src") }
-                .ifBlank { element.attr("data-video") }
-            if (raw.isBlank()) return@forEach
-
+        document.select(site.mediaSelector).forEach { element ->
+            val raw = when (element.tagName()) {
+                "source", "iframe" -> element.attr("src")
+                "video" -> element.attr("src")
+                else -> element.attr("src")
+            }.takeIf { it.isNotBlank() } ?: return@forEach
             val mediaUrl = absolute(data, raw)
             when {
-                mediaUrl.contains(".m3u8", true) -> {
-                    callback(newExtractorLink(name, "Web Source HLS", mediaUrl) {
-                        type = ExtractorLinkType.M3U8
+                mediaUrl.contains(".m3u8", ignoreCase = true) -> {
+                    callback(newExtractorLink(name, name, mediaUrl, ExtractorLinkType.M3U8) {
                         quality = Qualities.Unknown.value
-                        referer = data
                     })
                     found = true
                 }
-                mediaUrl.matches(Regex("(?i).+\\.(mp4|webm)(\\?.*)?$")) -> {
-                    callback(newExtractorLink(name, "Web Source", mediaUrl) {
-                        type = ExtractorLinkType.VIDEO
+                mediaUrl.contains(".mp4", ignoreCase = true) || mediaUrl.contains(".webm", ignoreCase = true) -> {
+                    callback(newExtractorLink(name, name, mediaUrl, ExtractorLinkType.VIDEO) {
                         quality = Qualities.Unknown.value
-                        referer = data
                     })
                     found = true
                 }
-                element.tagName() == "iframe" -> {
-                    runCatching {
-                        loadExtractor(mediaUrl, subtitleCallback, callback)
-                        found = true
-                    }
+                mediaUrl.startsWith("http", ignoreCase = true) -> {
+                    runCatching { loadExtractor(mediaUrl, data, subtitleCallback, callback) }
+                    found = true
                 }
             }
         }
-
         return found
     }
 }
