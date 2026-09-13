@@ -11,20 +11,21 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import com.lagradost.cloudstream3.plugins.BasePlugin
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
+import com.lagradost.cloudstream3.plugins.Plugin
 
 @CloudstreamPlugin
-class WebSourcePlugin : BasePlugin() {
+class WebSourcePlugin : Plugin() {
     private lateinit var provider: WebSourceProvider
 
-    override fun load() {
+    override fun load(context: Context) {
+        WebSourceSettings.init(context)
         provider = WebSourceProvider()
         registerMainAPI(provider)
+        openSettings = { settingsContext -> showSettings(settingsContext) }
     }
 
-    fun showSettings(context: Context) {
-        WebSourceSettings.init(context)
+    private fun showSettings(context: Context) {
         val density = context.resources.displayMetrics.density
         val padding = (16 * density).toInt()
         val spacing = (8 * density).toInt()
