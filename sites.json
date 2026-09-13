@@ -1,0 +1,24 @@
+{
+  "sites": [
+    {
+      "name": "W3Schools HTML5 Video (test)",
+      "baseUrl": "https://www.w3schools.com/html/html5_video.asp",
+      "enabled": true,
+      "searchUrl": null,
+      "resultSelector": "a[href]",
+      "linkSelector": "a[href]",
+      "titleSelector": "h1",
+      "posterSelector": null,
+      "descriptionSelector": "body",
+      "mediaSelector": "video source, video, iframe",
+      "proxy": null
+    }
+  ],
+  "proxies": [
+    {
+      "name": "My Authorized Proxy",
+      "template": "https://your-proxy.example/?url={url}",
+      "enabled": false
+    }
+  ]
+}
