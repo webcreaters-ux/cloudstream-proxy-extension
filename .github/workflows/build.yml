@@ -11,10 +11,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: Checkout builds branch
+        uses: actions/checkout@v4
+        with:
+          ref: builds
+          path: builds
+
+      - name: Clean old builds
+        run: |
+          find "$GITHUB_WORKSPACE/builds" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -30,12 +42,26 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
-      - name: Build extension
-        run: gradle make --stacktrace
+      - name: Build extension and plugin list
+        working-directory: src
+        run: |
+          gradle make makePluginsJson ensureJarCompatibility --stacktrace
+
+      - name: Publish builds branch
+        run: |
+          cp src/WebSourceProvider/build/*.cs3 builds/
+          cp src/WebSourceProvider/build/*.jar builds/ 2>/dev/null || true
+          cp src/build/plugins.json builds/
+          cd builds
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add -A
+          git commit -m "Build ${GITHUB_SHA}" || exit 0
+          git push origin builds
 
       - name: Upload CS3 artifact
         uses: actions/upload-artifact@v4
         with:
           name: cloudstream-proxy-extension
-          path: "**/build/*.cs3"
+          path: "src/**/build/*.cs3"
           if-no-files-found: error
