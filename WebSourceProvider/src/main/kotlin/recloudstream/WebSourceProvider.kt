@@ -9,6 +9,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 private const val CONFIG_URL = "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/main/sites.json"
+private const val W3SCHOOLS_TEST_URL = "https://www.w3schools.com/html/html5_video.asp"
 
 private val mapper = jacksonObjectMapper()
 
@@ -25,7 +26,7 @@ data class SiteConfig(
     val titleSelector: String? = null,
     val posterSelector: String? = null,
     val descriptionSelector: String? = null,
-    val mediaSelector: String = "video source, video, source, iframe",
+    val mediaSelector: String = "video source, video, source, iframe, meta[property='og:video'], meta[property='og:video:url']",
     val proxy: String? = null
 )
 
@@ -75,6 +76,19 @@ class WebSourceProvider : MainAPI() {
 
     private fun icon(site: SiteConfig): String? = site.iconUrl?.replace("%size%", "128")
 
+    private fun elementUrl(element: org.jsoup.nodes.Element, base: String): String? {
+        val raw = element.attr("href").ifBlank {
+            element.attr("src").ifBlank { element.attr("content") }
+        }
+        return raw.takeIf { it.isNotBlank() }?.let { absolute(base, it) }
+    }
+
+    private fun elementTitle(element: org.jsoup.nodes.Element, site: SiteConfig): String {
+        return element.attr("data-title").ifBlank {
+            element.text().trim()
+        }.ifBlank { site.name }
+    }
+
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val cfg = config()
         val cards = cfg.sites.filter { it.enabled }.map { site ->
@@ -91,37 +105,74 @@ class WebSourceProvider : MainAPI() {
     override suspend fun search(query: String): List<SearchResponse> {
         val cfg = config()
         val results = mutableListOf<SearchResponse>()
-        for (site in cfg.sites.filter { it.enabled && !it.searchUrl.isNullOrBlank() }) {
-            val url = site.searchUrl!!
+
+        for (site in cfg.sites.filter { it.enabled }) {
+            // W3Schools is a fixed public HTML5-video test page, not a video catalogue.
+            // Returning it for a search query lets us verify CloudStream's search -> load -> playback pipeline.
+            if (site.baseUrl == W3SCHOOLS_TEST_URL) {
+                results += newMovieSearchResponse(
+                    "${site.name} — $query",
+                    site.baseUrl,
+                    TvType.Movie
+                ) {
+                    posterUrl = icon(site)
+                }
+                continue
+            }
+
+            val template = site.searchUrl ?: continue
+            val url = template
                 .replace("{query}", encode(query))
                 .replace("{page}", "1")
+
             val document = runCatching {
-                Jsoup.parse(app.get(proxied(url, site, cfg)).text, site.baseUrl)
+                Jsoup.parse(
+                    app.get(
+                        proxied(url, site, cfg),
+                        headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")
+                    ).text,
+                    site.baseUrl
+                )
             }.getOrNull() ?: continue
+
             document.select(site.resultSelector).forEach { element ->
-                val href = element.attr("href").takeIf { it.isNotBlank() } ?: return@forEach
-                val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
-                    ?: element.text().ifBlank { site.name }
-                results += newMovieSearchResponse(title, absolute(site.baseUrl, href), TvType.Movie) {
+                val href = elementUrl(element, site.baseUrl) ?: return@forEach
+                if (!href.startsWith("http", ignoreCase = true)) return@forEach
+                val title = elementTitle(element, site)
+                results += newMovieSearchResponse(title, href, TvType.Movie) {
                     posterUrl = icon(site)
                 }
             }
         }
+
         return results.distinctBy { it.url }
     }
 
     override suspend fun load(url: String): LoadResponse {
         val cfg = config()
         val site = findSite(url, cfg) ?: throw ErrorLoadingException("No configured site for $url")
-        val document = Jsoup.parse(app.get(proxied(url, site, cfg)).text, url)
+        val document = Jsoup.parse(
+            app.get(
+                proxied(url, site, cfg),
+                headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")
+            ).text,
+            url
+        )
         val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
             ?: document.selectFirst("meta[property='og:title']")?.attr("content")
             ?: document.title().ifBlank { site.name }
-        val poster = site.posterSelector?.let { document.select(it).firstOrNull()?.attr("src") }
-            ?.let { absolute(url, it) }
+        val poster = site.posterSelector?.let { selector ->
+            document.select(selector).firstOrNull()?.let { element ->
+                element.attr("src").ifBlank { element.attr("content") }
+            }
+        }?.let { absolute(url, it) }
             ?: document.selectFirst("meta[property='og:image']")?.attr("content")
-        val description = site.descriptionSelector?.let { document.select(it).firstOrNull()?.text() }
-            ?: document.selectFirst("meta[property='og:description']")?.attr("content")
+        val description = site.descriptionSelector?.let { selector ->
+            document.select(selector).firstOrNull()?.let { element ->
+                element.attr("content").ifBlank { element.text() }
+            }
+        } ?: document.selectFirst("meta[property='og:description']")?.attr("content")
+
         return newMovieLoadResponse(title, url, TvType.Movie, url) {
             posterUrl = poster
             plot = description
@@ -136,14 +187,22 @@ class WebSourceProvider : MainAPI() {
     ): Boolean {
         val cfg = config()
         val site = findSite(data, cfg) ?: return false
-        val document = Jsoup.parse(app.get(proxied(data, site, cfg)).text, data)
+        val document = Jsoup.parse(
+            app.get(
+                proxied(data, site, cfg),
+                headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")
+            ).text,
+            data
+        )
         var found = false
+
         document.select(site.mediaSelector).forEach { element ->
             val raw = element.attr("src").takeIf { it.isNotBlank() }
                 ?: element.attr("data-src").takeIf { it.isNotBlank() }
                 ?: element.attr("content").takeIf { it.isNotBlank() }
                 ?: return@forEach
             val mediaUrl = absolute(data, raw)
+
             when {
                 mediaUrl.contains(".m3u8", ignoreCase = true) -> {
                     callback(newExtractorLink(name, name, mediaUrl, ExtractorLinkType.M3U8) {
