@@ -1,5 +1,29 @@
 [
     {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=archive.org&sz=%size%",
+        "jarFileSize": 79550,
+        "fileHash": "sha256-568311eb1831480342b196c800358366b9f7fc18b1d159290b68d149b5e147f0",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
+        "fileSize": 20047,
+        "status": 1,
+        "authors": [
+            "webcreaters-ux"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Others"
+        ],
+        "version": 1,
+        "internalName": "InternetArchive",
+        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/InternetArchive.jar",
+        "description": "Internet Archive public media search and playback provider.",
+        "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/InternetArchive.cs3",
+        "name": "InternetArchive",
+        "jarHash": "sha256-585c4872b60d713aa17a51eae2494928ec9b070f4e191bda8559ea890c1b867d"
+    },
+    {
         "iconUrl": "https://www.google.com/s2/favicons?domain=vkvideo.ru&sz=%size%",
         "jarFileSize": 41947,
         "fileHash": "sha256-93eb896d312b99671064dcab8c09ac32273c30b0812276858f59b134b6b18c6f",
