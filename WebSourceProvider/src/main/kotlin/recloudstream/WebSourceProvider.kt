@@ -2,9 +2,7 @@ package recloudstream
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.extractors.ExtractorLinkType
-import com.lagradost.cloudstream3.utils.AppUtils.toJson
-import com.lagradost.cloudstream3.utils.StringUtils
+import com.lagradost.cloudstream3.utils.*
 import org.jsoup.Jsoup
 import java.net.URI
 
@@ -66,7 +64,7 @@ class WebSourceProvider : MainAPI() {
     }
 
     private fun absolute(base: String, value: String): String {
-        return runCatching { URI(base).resolve(value).toString() }.getOrDefault(value)
+        return runCatching { URI.create(base).resolve(value).toString() }.getOrDefault(value)
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
@@ -87,7 +85,9 @@ class WebSourceProvider : MainAPI() {
             val url = site.searchUrl!!
                 .replace("{query}", StringUtils.encodeUri(query))
                 .replace("{page}", "1")
-            val document = runCatching { Jsoup.parse(app.get(proxied(url, site, cfg)).text, site.baseUrl) }.getOrNull() ?: continue
+            val document = runCatching {
+                Jsoup.parse(app.get(proxied(url, site, cfg)).text, site.baseUrl)
+            }.getOrNull() ?: continue
             document.select(site.resultSelector).forEach { element ->
                 val href = element.attr("href").takeIf { it.isNotBlank() } ?: return@forEach
                 val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
@@ -124,11 +124,7 @@ class WebSourceProvider : MainAPI() {
         val document = Jsoup.parse(app.get(proxied(data, site, cfg)).text, data)
         var found = false
         document.select(site.mediaSelector).forEach { element ->
-            val raw = when (element.tagName()) {
-                "source", "iframe" -> element.attr("src")
-                "video" -> element.attr("src")
-                else -> element.attr("src")
-            }.takeIf { it.isNotBlank() } ?: return@forEach
+            val raw = element.attr("src").takeIf { it.isNotBlank() } ?: return@forEach
             val mediaUrl = absolute(data, raw)
             when {
                 mediaUrl.contains(".m3u8", ignoreCase = true) -> {
