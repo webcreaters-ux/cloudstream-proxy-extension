@@ -1,5 +1,29 @@
 [
     {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=vkvideo.ru&sz=%size%",
+        "jarFileSize": 41947,
+        "fileHash": "sha256-93eb896d312b99671064dcab8c09ac32273c30b0812276858f59b134b6b18c6f",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
+        "fileSize": 11843,
+        "status": 1,
+        "authors": [
+            "webcreaters-ux"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Others"
+        ],
+        "version": 1,
+        "internalName": "VKVideo",
+        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/VKVideo.jar",
+        "description": "VK Video public video search provider.",
+        "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/VKVideo.cs3",
+        "name": "VKVideo",
+        "jarHash": "sha256-6c29cc01ee87478e6d50dc1efb0f998972e0b7204bffa56f4f9cccaf5c325db1"
+    },
+    {
         "iconUrl": "https://www.google.com/s2/favicons?domain=github.com&sz=%size%",
         "jarFileSize": 72136,
         "fileHash": "sha256-f73682502521d9dd0a254127d5040df08063bc1c42fbeb0427eaf1dcfb1378df",
@@ -22,5 +46,29 @@
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WebSourceProvider.cs3",
         "name": "WebSourceProvider",
         "jarHash": "sha256-064c77a26ef40ab732c5129685612fd38d48a2c8ef0d8b31c655c40b6a45f2fe"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=yandex.com&sz=%size%",
+        "jarFileSize": 42912,
+        "fileHash": "sha256-2301323ceeffb6bba2604b52f04b2cb050d7131ba797a4305a9af6549a35a4c6",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
+        "fileSize": 11958,
+        "status": 1,
+        "authors": [
+            "webcreaters-ux"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Others"
+        ],
+        "version": 1,
+        "internalName": "YandexVideo",
+        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/YandexVideo.jar",
+        "description": "Yandex Video public video search provider.",
+        "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/YandexVideo.cs3",
+        "name": "YandexVideo",
+        "jarHash": "sha256-22d59d2a6fd95ca9ab2ed3ad466d8d1f51d7eb7c6df965aea5a430504712bce4"
     }
 ]
