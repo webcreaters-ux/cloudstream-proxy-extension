@@ -1,0 +1,26 @@
+[
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=github.com&sz=%size%",
+        "jarFileSize": 67515,
+        "fileHash": "sha256-9417d8c21a31b7669d57d08755a65fa91416bb55e2a7a850447720abaaa8e962",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
+        "fileSize": 18979,
+        "status": 3,
+        "authors": [
+            "webcreaters-ux"
+        ],
+        "tvTypes": [
+            "Others",
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "WebSourceProvider",
+        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WebSourceProvider.jar",
+        "description": "Configurable CloudStream website provider with optional user-supplied proxy templates.",
+        "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WebSourceProvider.cs3",
+        "name": "WebSourceProvider",
+        "jarHash": "sha256-7975f8958dc0130c233fef3a2a457484b6999a7deae295a79fca833cceb10699"
+    }
+]
