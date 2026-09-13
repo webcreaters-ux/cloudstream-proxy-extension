@@ -18,6 +18,7 @@ data class SiteConfig(
     val name: String,
     val baseUrl: String,
     val enabled: Boolean = true,
+    val iconUrl: String? = null,
     val searchUrl: String? = null,
     val resultSelector: String = "a[href]",
     val linkSelector: String = "a[href]",
@@ -42,6 +43,9 @@ class WebSourceProvider : MainAPI() {
 
     private var cachedConfig: SourcesConfig? = null
 
+    private fun encode(value: String): String =
+        URLEncoder.encode(value, StandardCharsets.UTF_8)
+
     private suspend fun config(): SourcesConfig {
         cachedConfig?.let { return it }
         val parsed = runCatching {
@@ -50,9 +54,6 @@ class WebSourceProvider : MainAPI() {
         cachedConfig = parsed
         return parsed
     }
-
-    private fun encode(value: String): String =
-        URLEncoder.encode(value, StandardCharsets.UTF_8)
 
     private fun findSite(url: String, cfg: SourcesConfig): SiteConfig? {
         val targetHost = runCatching { URI(url).host }.getOrNull() ?: return null
@@ -72,13 +73,17 @@ class WebSourceProvider : MainAPI() {
         return runCatching { URI.create(base).resolve(value).toString() }.getOrDefault(value)
     }
 
+    private fun icon(site: SiteConfig): String? = site.iconUrl?.replace("%size%", "128")
+
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val cfg = config()
-        val cards = cfg.sites.filter { it.enabled }.map {
-            newMovieSearchResponse(it.name, it.baseUrl, TvType.Others)
+        val cards = cfg.sites.filter { it.enabled }.map { site ->
+            newMovieSearchResponse(site.name, site.baseUrl, TvType.Others) {
+                posterUrl = icon(site)
+            }
         }
         return newHomePageResponse(
-            listOf(HomePageList("Configured websites", cards, isHorizontalImages = true)),
+            listOf(HomePageList("Configured video sites", cards, isHorizontalImages = true)),
             hasNext = false
         )
     }
@@ -97,7 +102,9 @@ class WebSourceProvider : MainAPI() {
                 val href = element.attr("href").takeIf { it.isNotBlank() } ?: return@forEach
                 val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
                     ?: element.text().ifBlank { site.name }
-                results += newMovieSearchResponse(title, absolute(site.baseUrl, href), TvType.Movie)
+                results += newMovieSearchResponse(title, absolute(site.baseUrl, href), TvType.Movie) {
+                    posterUrl = icon(site)
+                }
             }
         }
         return results.distinctBy { it.url }
@@ -108,10 +115,13 @@ class WebSourceProvider : MainAPI() {
         val site = findSite(url, cfg) ?: throw ErrorLoadingException("No configured site for $url")
         val document = Jsoup.parse(app.get(proxied(url, site, cfg)).text, url)
         val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
+            ?: document.selectFirst("meta[property='og:title']")?.attr("content")
             ?: document.title().ifBlank { site.name }
         val poster = site.posterSelector?.let { document.select(it).firstOrNull()?.attr("src") }
             ?.let { absolute(url, it) }
+            ?: document.selectFirst("meta[property='og:image']")?.attr("content")
         val description = site.descriptionSelector?.let { document.select(it).firstOrNull()?.text() }
+            ?: document.selectFirst("meta[property='og:description']")?.attr("content")
         return newMovieLoadResponse(title, url, TvType.Movie, url) {
             posterUrl = poster
             plot = description
@@ -129,7 +139,10 @@ class WebSourceProvider : MainAPI() {
         val document = Jsoup.parse(app.get(proxied(data, site, cfg)).text, data)
         var found = false
         document.select(site.mediaSelector).forEach { element ->
-            val raw = element.attr("src").takeIf { it.isNotBlank() } ?: return@forEach
+            val raw = element.attr("src").takeIf { it.isNotBlank() }
+                ?: element.attr("data-src").takeIf { it.isNotBlank() }
+                ?: element.attr("content").takeIf { it.isNotBlank() }
+                ?: return@forEach
             val mediaUrl = absolute(data, raw)
             when {
                 mediaUrl.contains(".m3u8", ignoreCase = true) -> {
