@@ -50,7 +50,7 @@ class WebSourceProvider : MainAPI() {
     private suspend fun config(): SourcesConfig {
         cachedConfig?.let { return it }
         val parsed = runCatching {
-            mapper.readValue(app.get(CONFIG_URL).text, SourcesConfig::class.java)
+            mapper.readValue(app.get(CONFIG_URL, headers = mapOf("User-Agent" to WebSourceSettings.userAgent)).text, SourcesConfig::class.java)
         }.getOrDefault(SourcesConfig())
         cachedConfig = parsed
         return parsed
@@ -65,9 +65,14 @@ class WebSourceProvider : MainAPI() {
     }
 
     private fun proxied(url: String, site: SiteConfig, cfg: SourcesConfig): String {
-        val proxyName = site.proxy ?: return url
-        val proxy = cfg.proxies.firstOrNull { it.name == proxyName && it.enabled } ?: return url
-        return proxy.template.replace("{url}", encode(url))
+        val proxyName = site.proxy
+        val siteProxy = proxyName?.let { cfg.proxies.firstOrNull { p -> p.name == it && p.enabled } }
+        val configured = if (siteProxy != null) {
+            siteProxy.template.replace("{url}", encode(url))
+        } else {
+            url
+        }
+        return WebSourceSettings.applyProxy(configured)
     }
 
     private fun absolute(base: String, value: String): String {
@@ -89,6 +94,17 @@ class WebSourceProvider : MainAPI() {
         }.ifBlank { site.name }
     }
 
+    private fun preferredQuality(): Int = when (WebSourceSettings.preferredQuality) {
+        "2160p" -> Qualities.P2160.value
+        "1440p" -> Qualities.P1440.value
+        "1080p" -> Qualities.P1080.value
+        "720p" -> Qualities.P720.value
+        "480p" -> Qualities.P480.value
+        else -> Qualities.Unknown.value
+    }
+
+    private fun requestHeaders(): Map<String, String> = mapOf("User-Agent" to WebSourceSettings.userAgent)
+
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val cfg = config()
         val cards = cfg.sites.filter { it.enabled }.map { site ->
@@ -107,8 +123,6 @@ class WebSourceProvider : MainAPI() {
         val results = mutableListOf<SearchResponse>()
 
         for (site in cfg.sites.filter { it.enabled }) {
-            // W3Schools is a fixed public HTML5-video test page, not a video catalogue.
-            // Returning it for a search query lets us verify CloudStream's search -> load -> playback pipeline.
             if (site.baseUrl == W3SCHOOLS_TEST_URL) {
                 results += newMovieSearchResponse(
                     "${site.name} — $query",
@@ -127,10 +141,7 @@ class WebSourceProvider : MainAPI() {
 
             val document = runCatching {
                 Jsoup.parse(
-                    app.get(
-                        proxied(url, site, cfg),
-                        headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")
-                    ).text,
+                    app.get(proxied(url, site, cfg), headers = requestHeaders()).text,
                     site.baseUrl
                 )
             }.getOrNull() ?: continue
@@ -152,10 +163,7 @@ class WebSourceProvider : MainAPI() {
         val cfg = config()
         val site = findSite(url, cfg) ?: throw ErrorLoadingException("No configured site for $url")
         val document = Jsoup.parse(
-            app.get(
-                proxied(url, site, cfg),
-                headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")
-            ).text,
+            app.get(proxied(url, site, cfg), headers = requestHeaders()).text,
             url
         )
         val title = site.titleSelector?.let { document.select(it).firstOrNull()?.text() }
@@ -188,13 +196,11 @@ class WebSourceProvider : MainAPI() {
         val cfg = config()
         val site = findSite(data, cfg) ?: return false
         val document = Jsoup.parse(
-            app.get(
-                proxied(data, site, cfg),
-                headers = mapOf("User-Agent" to "Mozilla/5.0 (Android) CloudStream")
-            ).text,
+            app.get(proxied(data, site, cfg), headers = requestHeaders()).text,
             data
         )
         var found = false
+        val quality = preferredQuality()
 
         document.select(site.mediaSelector).forEach { element ->
             val raw = element.attr("src").takeIf { it.isNotBlank() }
@@ -206,13 +212,13 @@ class WebSourceProvider : MainAPI() {
             when {
                 mediaUrl.contains(".m3u8", ignoreCase = true) -> {
                     callback(newExtractorLink(name, name, mediaUrl, ExtractorLinkType.M3U8) {
-                        quality = Qualities.Unknown.value
+                        this.quality = quality
                     })
                     found = true
                 }
                 mediaUrl.contains(".mp4", ignoreCase = true) || mediaUrl.contains(".webm", ignoreCase = true) -> {
                     callback(newExtractorLink(name, name, mediaUrl, ExtractorLinkType.VIDEO) {
-                        quality = Qualities.Unknown.value
+                        this.quality = quality
                     })
                     found = true
                 }
