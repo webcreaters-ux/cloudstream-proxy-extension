@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PinkTorrent — Legal Torrent Directory</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap nav">
+    <a class="logo" href="#">PINK<span>TORRENT</span></a>
+    <nav><a href="#popular">Popular</a><a href="#categories">Categories</a><a href="#about">About</a></nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <h1>Find your next download</h1>
+    <p>Public-domain, open-source and freely licensed torrent metadata.</p>
+    <div class="search"><input id="search" placeholder="Search torrents..." autocomplete="off"><button onclick="filterTorrents()">Search</button></div>
+  </section>
+
+  <section id="categories" class="categories">
+    <button class="active" data-cat="All">All</button><button data-cat="Movies">Movies</button><button data-cat="TV">TV</button><button data-cat="Games">Games</button><button data-cat="Music">Music</button><button data-cat="Apps">Apps</button><button data-cat="Books">Books</button><button data-cat="Linux">Linux</button>
+  </section>
+
+  <section id="popular" class="panel">
+    <div class="panel-head"><div><h2>Popular Torrents</h2><span>Legal demo catalog</span></div><select id="sort"><option value="seeders">Seeders</option><option value="size">Size</option><option value="name">Name</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Seeders</th><th>Leechers</th><th>Date</th><th>Size</th><th>Uploader</th></tr></thead><tbody id="rows"></tbody></table></div>
+  </section>
+
+  <section id="about" class="notice"><strong>Legal content only.</strong> This template is intended for content you have permission to distribute, including open-source software, Linux distributions, public-domain works and Creative Commons media.</section>
+</main>
+<footer>PinkTorrent Template · Open legal-content directory UI</footer>
+<script src="app.js"></script>
+</body>
+</html>
