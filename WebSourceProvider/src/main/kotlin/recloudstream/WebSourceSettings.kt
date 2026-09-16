@@ -2,6 +2,7 @@ package recloudstream
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.net.URLEncoder
 
 object WebSourceSettings {
     private const val PREFS = "web_source_settings"
@@ -25,7 +26,8 @@ object WebSourceSettings {
         set(value) { prefs?.edit()?.putString(KEY_PROXY_URL, value)?.apply() }
 
     var userAgent: String
-        get() = prefs?.getString(KEY_USER_AGENT, "Mozilla/5.0 (Android) CloudStream") ?: "Mozilla/5.0 (Android) CloudStream"
+        get() = prefs?.getString(KEY_USER_AGENT, "Mozilla/5.0 (Android) CloudStream")
+            ?: "Mozilla/5.0 (Android) CloudStream"
         set(value) { prefs?.edit()?.putString(KEY_USER_AGENT, value)?.apply() }
 
     var preferredQuality: String
@@ -41,6 +43,6 @@ object WebSourceSettings {
         val template = proxyUrl.trim()
         if (!template.startsWith("http://") && !template.startsWith("https://")) return url
         if (!template.contains("{url}")) return url
-        return template.replace("{url}", java.net.URLEncoder.encode(url, "UTF-8"))
+        return template.replace("{url}", URLEncoder.encode(url, "UTF-8"))
     }
 }
