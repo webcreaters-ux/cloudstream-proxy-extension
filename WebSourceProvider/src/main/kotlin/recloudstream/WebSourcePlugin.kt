@@ -1,7 +1,7 @@
 package recloudstream
 
+import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Color
 import android.text.InputType
 import android.view.Gravity
 import android.view.ViewGroup
@@ -13,7 +13,6 @@ import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.Plugin
 
@@ -48,17 +47,11 @@ class WebSourcePlugin : Plugin() {
             setPadding(0, dp(10), 0, dp(4))
         }
 
-        fun edit(value: String, hint: String, multiLine: Boolean = false): EditText = EditText(context).apply {
+        fun edit(value: String, hint: String): EditText = EditText(context).apply {
             setText(value)
             this.hint = hint
             setPadding(dp(4), dp(4), dp(4), dp(4))
-            if (multiLine) {
-                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                minLines = 3
-                gravity = Gravity.TOP
-            } else {
-                inputType = InputType.TYPE_CLASS_TEXT
-            }
+            inputType = InputType.TYPE_CLASS_TEXT
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -119,18 +112,13 @@ class WebSourcePlugin : Plugin() {
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val template = proxyUrl.text.toString().trim()
-                if (proxySwitch.isChecked &&
-                    template.isNotEmpty() &&
-                    !template.contains("{url}")
-                ) {
+                if (proxySwitch.isChecked && template.isNotEmpty() && !template.contains("{url}")) {
                     proxyUrl.error = "Template must contain {url}"
                     return@setOnClickListener
                 }
 
-                if (proxySwitch.isChecked &&
-                    template.isNotEmpty() &&
-                    !template.startsWith("http://") &&
-                    !template.startsWith("https://")
+                if (proxySwitch.isChecked && template.isNotEmpty() &&
+                    !template.startsWith("http://") && !template.startsWith("https://")
                 ) {
                     proxyUrl.error = "Use an http:// or https:// endpoint"
                     return@setOnClickListener
