@@ -92,6 +92,30 @@
         "jarHash": "sha256-213494d617b14042860d4471f9d7a909867afde2ec72f33a073499e3b2ea0f55"
     },
     {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=xstream.cc&sz=%size%",
+        "jarFileSize": 6213,
+        "fileHash": "sha256-b81af1a6d02db9b945e4574a2484dde1ef4f778caf87a1a93755f4911a83f7e9",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
+        "fileSize": 2801,
+        "status": 3,
+        "authors": [
+            "webcreaters-ux"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Others"
+        ],
+        "version": 1,
+        "internalName": "XStreamTemplate",
+        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/XStreamTemplate.jar",
+        "description": "Standalone XStream-style provider template. Isolated from the other repository providers.",
+        "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/XStreamTemplate.cs3",
+        "name": "XStreamTemplate",
+        "jarHash": "sha256-20e7bff3a0a3951be2a451e66dc372e4d13e5717fd52ab2560262bd7aee031a0"
+    },
+    {
         "iconUrl": "https://www.google.com/s2/favicons?domain=yandex.com&sz=%size%",
         "jarFileSize": 41109,
         "fileHash": "sha256-5b3d8ac245c64391e78ddb479344fa1f25a0798755c8f9c3257b1c42a2a4b838",
