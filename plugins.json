@@ -1,11 +1,11 @@
 [
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=archive.org&sz=%size%",
-        "jarFileSize": 79550,
-        "fileHash": "sha256-568311eb1831480342b196c800358366b9f7fc18b1d159290b68d149b5e147f0",
+        "jarFileSize": 74527,
+        "fileHash": "sha256-2565af65e3eec67e0886cf67f79765c6abee7fcc16bf7c920358e1e105637968",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 20047,
+        "fileSize": 17988,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -21,15 +21,15 @@
         "description": "Internet Archive public media search and playback provider.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/InternetArchive.cs3",
         "name": "InternetArchive",
-        "jarHash": "sha256-585c4872b60d713aa17a51eae2494928ec9b070f4e191bda8559ea890c1b867d"
+        "jarHash": "sha256-ab985acdf7d49b77025a4556c8a7aef3d032ac1414fc22a43da5dc23c1a08a25"
     },
     {
-        "iconUrl": "https://www.google.com/s2/favicons?domain=vkvideo.ru&sz=%size%",
-        "jarFileSize": 41947,
-        "fileHash": "sha256-93eb896d312b99671064dcab8c09ac32273c30b0812276858f59b134b6b18c6f",
+        "iconUrl": "https://vkvideo.ru/favicon.ico",
+        "jarFileSize": 40158,
+        "fileHash": "sha256-e8397995194400f7fd86a1a5c9d42879a12648606a3c9bee723904bea3fcbc6c",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 11843,
+        "fileSize": 10585,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -39,22 +39,21 @@
             "TvSeries",
             "Others"
         ],
-        "version": 1,
+        "version": 2,
         "internalName": "VKVideo",
         "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/VKVideo.jar",
-        "description": "VK Video public video search provider.",
+        "description": "VK Video public video search and playback provider.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/VKVideo.cs3",
         "name": "VKVideo",
-        "jarHash": "sha256-6c29cc01ee87478e6d50dc1efb0f998972e0b7204bffa56f4f9cccaf5c325db1"
+        "jarHash": "sha256-b59d04d5acb205a74fbd6e2c431966ee330517914c993461484e3403fcda1226"
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=github.com&sz=%size%",
-        "jarFileSize": 72136,
-        "fileHash": "sha256-f73682502521d9dd0a254127d5040df08063bc1c42fbeb0427eaf1dcfb1378df",
+        "fileHash": "sha256-ada9ef606e522e1b09b8e3aa68708e15a7f354660f892365fb496f922e0d3113",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 20775,
-        "status": 3,
+        "fileSize": 24616,
+        "status": 1,
         "authors": [
             "webcreaters-ux"
         ],
@@ -65,19 +64,40 @@
         ],
         "version": 1,
         "internalName": "WebSourceProvider",
-        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WebSourceProvider.jar",
-        "description": "Configurable CloudStream website provider with optional user-supplied proxy templates.",
+        "description": "Configurable CloudStream website provider with native per-plugin settings.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WebSourceProvider.cs3",
-        "name": "WebSourceProvider",
-        "jarHash": "sha256-064c77a26ef40ab732c5129685612fd38d48a2c8ef0d8b31c655c40b6a45f2fe"
+        "name": "WebSourceProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=commons.wikimedia.org&sz=%size%",
+        "jarFileSize": 48293,
+        "fileHash": "sha256-65536764f150062bec9739d7ab05ea5d4a99367c724b5eee24c5316bed43f3e0",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
+        "fileSize": 12033,
+        "status": 1,
+        "authors": [
+            "webcreaters-ux"
+        ],
+        "tvTypes": [
+            "Movie",
+            "Others"
+        ],
+        "version": 1,
+        "internalName": "WikimediaCommons",
+        "jarUrl": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WikimediaCommons.jar",
+        "description": "Public-domain and freely licensed media from Wikimedia Commons.",
+        "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WikimediaCommons.cs3",
+        "name": "WikimediaCommons",
+        "jarHash": "sha256-213494d617b14042860d4471f9d7a909867afde2ec72f33a073499e3b2ea0f55"
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=yandex.com&sz=%size%",
-        "jarFileSize": 42912,
-        "fileHash": "sha256-2301323ceeffb6bba2604b52f04b2cb050d7131ba797a4305a9af6549a35a4c6",
+        "jarFileSize": 41109,
+        "fileHash": "sha256-5b3d8ac245c64391e78ddb479344fa1f25a0798755c8f9c3257b1c42a2a4b838",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 11958,
+        "fileSize": 10715,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -93,6 +113,6 @@
         "description": "Yandex Video public video search provider.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/YandexVideo.cs3",
         "name": "YandexVideo",
-        "jarHash": "sha256-22d59d2a6fd95ca9ab2ed3ad466d8d1f51d7eb7c6df965aea5a430504712bce4"
+        "jarHash": "sha256-cfcd4935d8093bbcd27c16d4cf3da99e1ae09e56de9180860ce6d8cc5dfa326b"
     }
 ]
