@@ -117,11 +117,11 @@
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=yandex.com&sz=%size%",
-        "jarFileSize": 41109,
-        "fileHash": "sha256-5b3d8ac245c64391e78ddb479344fa1f25a0798755c8f9c3257b1c42a2a4b838",
+        "jarFileSize": 49592,
+        "fileHash": "sha256-363706ffa9820bd139dd579519c5b7b3e3c8bf5e249199b4839702aa619b0ed2",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 10715,
+        "fileSize": 12802,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -137,6 +137,6 @@
         "description": "Yandex Video public video search provider.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/YandexVideo.cs3",
         "name": "YandexVideo",
-        "jarHash": "sha256-cfcd4935d8093bbcd27c16d4cf3da99e1ae09e56de9180860ce6d8cc5dfa326b"
+        "jarHash": "sha256-d546fd4202bebcdc83d235e226b41977e28ae33ecb2f1e9a7f2c33e133e197c1"
     }
 ]
