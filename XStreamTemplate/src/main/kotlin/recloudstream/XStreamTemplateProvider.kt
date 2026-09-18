@@ -24,11 +24,4 @@ class XStreamTemplateProvider : MainAPI() {
     override suspend fun load(url: String): LoadResponse {
         throw Error("This standalone template does not load adult media.")
     }
-
-    override suspend fun loadLinks(
-        data: String,
-        isCasting: Boolean,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean = false
 }
