@@ -25,11 +25,11 @@
     },
     {
         "iconUrl": "https://vkvideo.ru/favicon.ico",
-        "jarFileSize": 40158,
-        "fileHash": "sha256-e8397995194400f7fd86a1a5c9d42879a12648606a3c9bee723904bea3fcbc6c",
+        "jarFileSize": 48348,
+        "fileHash": "sha256-3692ababfec310fef87d6f7709c4d3b9b2de437564edf1d3977e01bb77c6cabe",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 10585,
+        "fileSize": 12631,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -45,7 +45,7 @@
         "description": "VK Video public video search and playback provider.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/VKVideo.cs3",
         "name": "VKVideo",
-        "jarHash": "sha256-b59d04d5acb205a74fbd6e2c431966ee330517914c993461484e3403fcda1226"
+        "jarHash": "sha256-abd434b5db3a0ff1183d5184b11c3197edc4b12383cc423f67448a872387a751"
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=github.com&sz=%size%",
