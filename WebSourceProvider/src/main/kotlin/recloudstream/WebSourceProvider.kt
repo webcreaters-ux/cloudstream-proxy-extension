@@ -26,7 +26,7 @@ data class SiteConfig(
     val titleSelector: String? = null,
     val posterSelector: String? = null,
     val descriptionSelector: String? = null,
-    val mediaSelector: String = "video source, video, source, iframe, meta[property='og:video'], meta[property='og:video:url']",
+    val mediaSelector: String = "video source, video, source, iframe, meta[property='og:video'], meta[property='og:video:url'], meta[property='og:video:secure_url']",
     val proxy: String? = null
 )
 
@@ -83,15 +83,15 @@ class WebSourceProvider : MainAPI() {
 
     private fun elementUrl(element: org.jsoup.nodes.Element, base: String): String? {
         val raw = element.attr("href").ifBlank {
-            element.attr("src").ifBlank { element.attr("content") }
+            element.attr("src").ifBlank { element.attr("data-src") }.ifBlank { element.attr("content") }
         }
         return raw.takeIf { it.isNotBlank() }?.let { absolute(base, it) }
     }
 
     private fun elementTitle(element: org.jsoup.nodes.Element, site: SiteConfig): String {
-        return element.attr("data-title").ifBlank {
-            element.text().trim()
-        }.ifBlank { site.name }
+        return element.attr("data-title").ifBlank { element.attr("aria-label") }.ifBlank { element.attr("title") }.ifBlank {
+            element.selectFirst("img")?.attr("alt").orEmpty()
+        }.ifBlank { element.text().trim() }.ifBlank { site.name }
     }
 
     private fun preferredQuality(): Int = when (WebSourceSettings.preferredQuality) {
