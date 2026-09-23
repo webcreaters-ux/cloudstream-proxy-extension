@@ -1,11 +1,11 @@
 [
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=archive.org&sz=%size%",
-        "jarFileSize": 74527,
-        "fileHash": "sha256-2565af65e3eec67e0886cf67f79765c6abee7fcc16bf7c920358e1e105637968",
+        "jarFileSize": 74573,
+        "fileHash": "sha256-02a06e7c37caca4dd049539b48c69e00b4e1a9e5a25875bfc86618daa6fb4dad",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 17988,
+        "fileSize": 18023,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -21,7 +21,7 @@
         "description": "Internet Archive public media search and playback provider.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/InternetArchive.cs3",
         "name": "InternetArchive",
-        "jarHash": "sha256-ab985acdf7d49b77025a4556c8a7aef3d032ac1414fc22a43da5dc23c1a08a25"
+        "jarHash": "sha256-e0f15a0b04e6ffe0f198b0e1cf1f2e1938a9d9ef966a1b9f42427f25c2e9dbbd"
     },
     {
         "iconUrl": "https://vkvideo.ru/favicon.ico",
@@ -49,10 +49,10 @@
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=github.com&sz=%size%",
-        "fileHash": "sha256-ada9ef606e522e1b09b8e3aa68708e15a7f354660f892365fb496f922e0d3113",
+        "fileHash": "sha256-83aab5d8b54eeae78988aa0b5d4088136a93c801aaa2c5881321d94b41a5054d",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 24616,
+        "fileSize": 24763,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -70,11 +70,11 @@
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=commons.wikimedia.org&sz=%size%",
-        "jarFileSize": 48293,
-        "fileHash": "sha256-65536764f150062bec9739d7ab05ea5d4a99367c724b5eee24c5316bed43f3e0",
+        "jarFileSize": 56003,
+        "fileHash": "sha256-d10f8ec8cc7ef00be1df0d854ceffbe720ad33e903b41b8ef3b605386035d58e",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/webcreaters-ux/cloudstream-proxy-extension",
-        "fileSize": 12033,
+        "fileSize": 13963,
         "status": 1,
         "authors": [
             "webcreaters-ux"
@@ -89,7 +89,7 @@
         "description": "Public-domain and freely licensed media from Wikimedia Commons.",
         "url": "https://raw.githubusercontent.com/webcreaters-ux/cloudstream-proxy-extension/builds/WikimediaCommons.cs3",
         "name": "WikimediaCommons",
-        "jarHash": "sha256-213494d617b14042860d4471f9d7a909867afde2ec72f33a073499e3b2ea0f55"
+        "jarHash": "sha256-9eb0541e115c014fb527fa64a3993cbd41abc42d587048663c2b7b85edbb566d"
     },
     {
         "iconUrl": "https://www.google.com/s2/favicons?domain=xstream.cc&sz=%size%",
