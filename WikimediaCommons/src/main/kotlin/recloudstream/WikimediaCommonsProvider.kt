@@ -28,6 +28,7 @@ class WikimediaCommonsProvider : MainAPI() {
     override var name = "Wikimedia Commons"
     override var lang = "en"
     override val supportedTypes = setOf(TvType.Movie, TvType.Others)
+    override val hasMainPage = true
 
     private val mapper = jacksonObjectMapper()
 
@@ -39,6 +40,21 @@ class WikimediaCommonsProvider : MainAPI() {
             val response = mapper.readValue<CommonsResponse>(app.get(url, headers = mapOf("User-Agent" to UA)).text)
             response.query?.pages?.values?.toList().orEmpty()
         }.getOrDefault(emptyList())
+    }
+
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        val queries = listOf("video", "football video", "nature video")
+        val lists = queries.mapNotNull { query ->
+            val items = searchPages(query).mapNotNull { pageItem ->
+                val title = pageItem.title?.removePrefix("File:")?.trim() ?: return@mapNotNull null
+                val info = pageItem.imageinfo.firstOrNull() ?: return@mapNotNull null
+                val media = info.url ?: return@mapNotNull null
+                if (!isVideo(media, info.mime)) return@mapNotNull null
+                newMovieSearchResponse(title, media, TvType.Movie)
+            }.distinctBy { it.url }
+            if (items.isEmpty()) null else HomePageList(query.replaceFirstChar { it.uppercase() }, items, isHorizontalImages = true)
+        }
+        return newHomePageResponse(lists, hasNext = false)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
