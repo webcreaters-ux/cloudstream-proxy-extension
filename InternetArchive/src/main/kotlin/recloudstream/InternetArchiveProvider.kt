@@ -82,7 +82,7 @@ class InternetArchiveProvider : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        return searchArchive(query, 1).mapNotNull { doc ->
+        return searchArchive("mediatype:movies AND ($query)", 1).mapNotNull { doc ->
             val id = doc.identifier ?: return@mapNotNull null
             newMovieSearchResponse(displayTitle(doc), "$BASE/details/$id", TvType.Movie) {
                 posterUrl = "$BASE/services/img/$id"
